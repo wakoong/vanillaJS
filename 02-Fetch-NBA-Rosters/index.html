@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Fetch NBA Rosters</title>
+</head>
+<style>
+	.team-info {
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+	}
+	.roster-table {
+		border: 1px solid black;
+		width: 98vw;
+		text-align: center;
+	}
+
+	.roster-table > thead {
+		background-color: #333;
+    	color: #fff;
+	}
+
+	.roster-table > tbody > tr:nth-child(2n) {
+		background: #e2e2e2;
+	}
+
+	.roster-table > tbody > tr > td {
+		padding: 2rem;
+	}
+</style>
+<body>
+	<form>
+		<div class="inputs">
+			<select>
+				<option>Select Team</option>
+			</select>
+		</div>
+	</form>
+	<div class="team-info">
+		
+	</div>
+	<table class="roster-table">
+		<thead>
+			<tr>
+				<th>Positon</th>
+				<th>Name</th>
+				<th>Number</th>
+				<th>Height</th>
+				<th>Weight</th>
+				<th>Years</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</body>
+<script>
+    const endpoint = "https://www.balldontlie.io/api/v1/teams";
+		const select = document.querySelector('select');
+		const teamInfo = document.querySelector('.team-info');
+		const rosters = document.querySelector('.roster-table > tbody');
+	
+    function render() {
+        fetchTeams();
+    }
+
+    async function fetchTeams() {
+				const teams = [];
+        const blob = await fetch(endpoint);
+        const result = await blob.json();
+        teams.push(...result.data);
+        teams.map(team => {
+            const option = document.createElement("option");
+            option.text = `${team.abbreviation}, ${team.city}`;
+            option.value = `${team.name}`;
+            select.appendChild(option);
+        })
+    }
+
+    async function fetchRoster(event) {
+				const teamName = event.target.value.toLowerCase();
+			
+        try {
+            const blob = await fetch(`http://data.nba.net/json/cms/noseason/team/${teamName}/roster.json`);
+						const result = await blob.json();
+						
+            populateRosters(result);
+        } catch (err) {
+            console.error(err)
+        }
+		}
+		
+		async function populateRosters(json) {
+			// clear out exisiting table
+			while (rosters.firstChild || teamInfo.firstChild) {
+				if (rosters.firstChild) rosters.removeChild(rosters.firstChild)
+				if (teamInfo.firstChild) teamInfo.removeChild(teamInfo.firstChild)
+			}
+			
+			// populate table
+			const teamData = json?.sports_content?.roster;
+			if (teamData) {
+				const { 
+					coaches: {coach} = {}, 
+					players: {player} = {}, 
+					season_year, 
+					team: {team_city, team_nickname} = {}
+				} = teamData;
+				// Populate coaches
+				const teamInfoHtml = `
+					<h1>${team_city} ${team_nickname}</h1>
+					<h2>Head Coach: ${coach[0].first_name} ${coach[0].last_name}</h2>
+				`
+				
+				teamInfo.innerHTML = teamInfoHtml;
+				// Populate players
+				const playerHtml = player.reduce((acc, currentPlayer) => {
+					const {first_name, last_name, position_short, jersey_number, 
+									height_ft, height_in, weight_lbs, years_pro } = currentPlayer;
+					return acc + `
+						<tr>
+							<td>${position_short}</td>
+							<td>${first_name} ${last_name}</td>
+							<td>${jersey_number}</td>
+							<td>${height_ft}'${height_in}</td>
+							<td>${weight_lbs}lbs</td>
+							<td>${years_pro}</td>
+						</tr>		
+					`
+				}, "")
+				rosters.innerHTML = playerHtml;
+			}
+		}
+		select.addEventListener("change", fetchRoster);
+		render();
+</script>
+</html>
