@@ -1,0 +1,135 @@
+<!-- resource: https://github.com/wesbos/JavaScript30/blob/master/05%20-%20Flex%20Panel%20Gallery/index-FINISHED.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flex Panels Image Gallery</title>
+    <script defer src="index.js"></script>
+</head>
+<style>
+    html {
+      box-sizing: border-box;
+      font-family: 'helvetica neue';
+      font-size: 20px;
+      font-weight: 200;
+    }
+    
+    body {
+      margin: 0;
+    }
+
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+
+    .roster-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        overflow: hidden;
+    }
+
+    .player {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        border: 1px solid black;
+        background: #1b4592;
+        color: white;
+        box-shadow: inset 0 0 0 5px rgba(255,255,255,0.1);
+        transition:
+            font-size 0.7s cubic-bezier(0.61,-0.19, 0.7,-0.11),
+            flex 0.7s cubic-bezier(0.61,-0.19, 0.7,-0.11),
+            background 0.2s;
+    }
+
+    .player.open {
+        flex: 5;
+        font-size: 40px;
+        font-weight: bold;
+    }
+
+    .photo {
+       min-height: 250px;
+       height: auto;
+       background-size: cover;
+       background-position: center;
+    }
+
+    .player-1 { background-image:url(https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/3975.png&w=350&h=254) }
+    .player-2 { background-image:url(https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/6475.png&w=350&h=254); }
+    .player-3 { background-image:url(https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/6589.png&w=350&h=254); }
+    .player-4 { background-image:url(https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/3059319.png&w=350&h=254); }
+    .player-5 { background-image:url(https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/3133603.png&w=350&h=254); }
+
+    .player > *:nth-child(2) { transform: translateY(100%); }
+    .player.open-active > *:nth-child(2) { transform: translateY(0); }
+
+</style>
+<body>
+    <div class="roster-container">
+        <div class="player">
+            <div class="photo player-1"></div>
+            <div class="info">
+                <p class="name">Steph Curry</p>
+                <p>30</p>
+                <p>SG</p>
+            </div>
+        </div>    
+        <div class="player">
+            <div class="photo player-2"></div>
+            <div class="info">
+                <p class="name">Klay Thompson</p>
+                <p>11</p>
+                <p>SG</p>
+            </div>
+        </div>
+        <div class="player">
+            <div class="photo player-3"></div>
+            <div class="info">
+                <p class="name">Draymond Green</p>
+                <p>30</p>
+                <p>C</p>
+            </div>
+        </div>
+        <div class="player">
+            <div class="photo player-4"></div>
+            <div class="info">
+                <p class="name">Andrew Wiggnins</p>
+                <p>30</p>
+                <p>SG</p>
+            </div>
+        </div>
+        <div class="player">
+            <div class="photo player-5"></div>
+            <div class="info">
+                <p class="name">Kelly Oubre Jr.</p>
+                <p>30</p>
+                <p>SF</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const players = document.querySelectorAll('.player');
+    
+        function toggleOpen() {
+            this.classList.toggle('open');
+        }
+
+        function toggleActive(e) {
+            console.log(e.propertyName)
+            if (e.propertyName.includes('flex')) {
+                this.classList.toggle('open-active');
+            }
+        }
+
+        players.forEach(player => player.addEventListener("click", toggleOpen));
+        players.forEach(player => player.addEventListener("transitionend", toggleActive));
+    </script>
+</body>
+</html>
